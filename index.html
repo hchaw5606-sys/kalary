@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d9488">
+<meta name="description" content="Kalary — بەرنامەی مۆبایل بۆ وێنەگرتن و بەڕێوەبردنی وێنەی مامەڵات و پسوولەکان">
+<title>Kalary — وێنەی مامەڵات | Transaction Photos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo" aria-hidden="true">🧾</div>
+  <div>
+    <h1 id="appTitle">کالاری</h1>
+    <p id="appSub">وێنەی مامەڵات</p>
+  </div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
+  <button class="icon-btn" id="langBtn" title="Language">🌐</button>
+</header>
+
+<main>
+  <div class="install-banner" id="installBanner">
+    <b id="installTitle">📲 بەرنامەکە لەسەر مۆبایل دامەزرێنە</b><br>
+    <span id="installHint">لە مێنیو (⋮) «Add to Home screen» هەڵبژێرە</span>
+  </div>
+
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <div class="bal-label" id="lblBalance">مانەوە</div>
+      <div class="bal" id="heroBalance">0</div>
+      <div class="row">
+        <div class="mini"><small id="lblIncome">داهات</small><b class="pos" id="heroIncome" style="color:#a7f3d0">0</b></div>
+        <div class="mini"><small id="lblExpense">خەرجی</small><b id="heroExpense" style="color:#fecaca">0</b></div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><b id="statCount">0</b><span id="lblCount">مامەڵات</span></div>
+      <div class="stat"><b id="statPhotos">0</b><span id="lblPhotos">وێنە</span></div>
+      <div class="stat"><b id="statAvg">0</b><span id="lblAvg">تێکڕا</span></div>
+    </div>
+    <div class="section-head">
+      <h2 id="lblRecent">دوایین مامەڵاتەکان</h2>
+      <button class="link-btn" id="seeAllBtn">بینینی هەموو →</button>
+    </div>
+    <div class="tx-list" id="recentList"></div>
+    <div class="empty hidden" id="homeEmpty">
+      <div class="big">📸</div><h3 id="emptyTitle">هیچ مامەڵاتێک نییە</h3>
+      <p id="emptyHint">بۆ دەستپێکردن، دوگمەی + دابگرە و وێنەی پسوولەکە بگرە</p>
+    </div>
+  </section>
+
+  <!-- LIST -->
+  <section class="view" id="view-list">
+    <div class="filters">
+      <label class="search">🔍 <input id="searchInput" type="search" placeholder="گەڕان بە ناو یان کەس..."></label>
+      <select class="pill" id="sortSelect">
+        <option value="new" data-i="sortNew">نوێترین</option>
+        <option value="old" data-i="sortOld">کۆنترین</option>
+        <option value="high" data-i="sortHigh">بەرزترین بڕ</option>
+        <option value="low" data-i="sortLow">نزمترین بڕ</option>
+      </select>
+      <button class="pill" id="viewToggle" style="border:1px solid var(--line)">⊞</button>
+    </div>
+    <div class="chips" id="typeChips">
+      <button class="chip on" data-type="all">هەموو</button>
+      <button class="chip" data-type="income">داهات</button>
+      <button class="chip" data-type="expense">خەرجی</button>
+    </div>
+    <div class="chips" id="catChips"></div>
+    <div class="tx-list" id="fullList"></div>
+    <div class="empty hidden" id="listEmpty"><div class="big">🔎</div><h3 id="listEmptyTitle">هیچ ئەنجامێک نییە</h3></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="view" id="view-stats">
+    <div class="panel"><h3 id="lblByCat">بەپێی پۆل</h3><div id="catBars"></div></div>
+    <div class="panel"><h3 id="lblByMonth">بەپێی مانگ</h3><canvas class="chart" id="monthChart" width="600" height="220"></canvas></div>
+    <div class="panel"><h3 id="lblSummary">کۆی گشتی</h3><div id="summaryBox"></div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="view-settings">
+    <div class="panel">
+      <div class="set-row"><div class="lbl"><b id="lblLang">زمان</b><span id="lblLangSub">کوردی / العربية / English</span></div>
+        <select class="pill" id="langSelect"><option value="ku">کوردی</option><option value="ar">العربية</option><option value="en">English</option></select></div>
+      <div class="set-row"><div class="lbl"><b id="lblTheme">ڕووناکی</b><span id="lblThemeSub">Dark / Light</span></div>
+        <select class="pill" id="themeSelect"><option value="light">☀️ Light</option><option value="dark">🌙 Dark</option></select></div>
+      <div class="set-row"><div class="lbl"><b id="lblCurrency">دراو</b><span>IQD · USD · EUR</span></div>
+        <select class="pill" id="currencySelect"></select></div>
+      <div class="set-row"><div class="lbl"><b id="lblStorage">هەڵگرتن لەسەر ئامێرەکە</b><span id="storageInfo">IndexedDB · Offline</span></div><span>💾</span></div>
+      <div class="set-row"><div class="lbl"><b id="lblOffline">کار لە ئۆفلاین دەکات</b><span>PWA · Service Worker</span></div><span>📶</span></div>
+    </div>
+    <div class="panel">
+      <h3>💾 Backup</h3>
+      <div class="btn-row">
+        <button class="btn" id="exportJsonBtn">⬇️ JSON</button>
+        <button class="btn" id="exportCsvBtn">⬇️ CSV</button>
+        <button class="btn" id="importBtn">⬆️ Import</button>
+        <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+      </div>
+      <div class="btn-row"><button class="btn danger" id="clearBtn" style="width:100%">🗑️ <span id="lblClear">سڕینەوەی هەموو داتاکان</span></button></div>
+    </div>
+    <p style="text-align:center;color:var(--muted);font-size:12px;margin-top:18px" id="versionLine">وەشان ١.٠ — PWA بۆ مۆبایل و کۆمپیوتەر</p>
+  </section>
+</main>
+
+<button class="fab" id="fabBtn" aria-label="Add">+</button>
+
+<nav class="bottomnav">
+  <button data-view="home" class="on"><span class="ic">🏠</span><span data-i="home">ماڵەوە</span></button>
+  <button data-view="list"><span class="ic">🧾</span><span data-i="list">مامەڵاتەکان</span></button>
+  <button data-view="stats"><span class="ic">📊</span><span data-i="stats">ئامار</span></button>
+  <button data-view="settings"><span class="ic">⚙️</span><span data-i="settings">ڕێکخستن</span></button>
+</nav>
+
+<!-- ADD / EDIT SHEET -->
+<div class="overlay" id="formOverlay">
+  <div class="sheet">
+    <h2 id="formTitle">➕ زیادکردن</h2>
+    <div class="field">
+      <label id="lblPhoto">وێنە</label>
+      <div class="photo-box" id="photoBox">
+        <div id="photoPlaceholder">📸<br><span id="photoHint">وێنەی پسوولەکە لێرە دەردەکەوێت</span></div>
+        <img id="photoPreview" class="hidden" alt="preview">
+        <div class="photo-actions">
+          <button class="btn" id="camBtn">📷 <span data-i="camera">کامێرا</span></button>
+          <button class="btn" id="galleryBtn">🖼️ <span data-i="gallery">لە گالێری</span></button>
+          <button class="btn ghost hidden" id="removePhotoBtn">✕</button>
+        </div>
+        <input type="file" id="galleryInput" accept="image/*" class="hidden">
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
+      </div>
+    </div>
+    <div class="field"><label data-i="title">ناونیشان</label><input id="fTitle" placeholder="..."></div>
+    <div style="display:grid;grid-template-columns:1fr 120px;gap:10px">
+      <div class="field"><label data-i="amount">بڕ</label><input id="fAmount" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+      <div class="field"><label data-i="currency">دراو</label><select id="fCurrency"></select></div>
+    </div>
+    <div class="field"><label data-i="type">جۆر</label>
+      <div class="seg"><button type="button" id="typeIncome">💰 <span data-i="income">داهات</span></button><button type="button" id="typeExpense" class="on-exp">💸 <span data-i="expense">خەرجی</span></button></div>
+    </div>
+    <div class="field"><label data-i="category">پۆل</label><select id="fCategory"></select></div>
+    <div class="field"><label data-i="person">کەس / کڕیار</label><input id="fPerson" placeholder="..."></div>
+    <div class="field"><label data-i="date">بەروار</label><input id="fDate" type="date"></div>
+    <div class="field"><label data-i="notes">تێبینی</label><textarea id="fNotes" rows="2" placeholder="..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn ghost" id="formCancel" data-i="cancel">هەڵوەشاندنەوە</button>
+      <button class="btn primary" id="formSave" data-i="save">پاشەکەوتکردن</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL SHEET -->
+<div class="overlay" id="detailOverlay">
+  <div class="sheet">
+    <h2 id="detailTitle">🧾</h2>
+    <img id="detailImg" class="detail-img hidden" alt="transaction photo">
+    <div id="detailNoImg" class="photo-box hidden">📷 <span data-i="noPhoto">بێ وێنە</span></div>
+    <dl class="kv" id="detailKv"></dl>
+    <div class="btn-row">
+      <button class="btn" id="detailShare">↗️ <span data-i="share">هاوبەشکردن</span></button>
+      <button class="btn" id="detailDownload">⬇️ <span data-i="download">داگرتن</span></button>
+      <button class="btn" id="detailEdit">✏️ <span data-i="edit">دەستکاری</span></button>
+      <button class="btn danger" id="detailDelete">🗑️ <span data-i="del">سڕینەوە</span></button>
+    </div>
+    <div class="btn-row"><button class="btn ghost" id="detailClose" data-i="close">داخستن</button></div>
+  </div>
+</div>
+
+<!-- CAMERA SHEET -->
+<div class="overlay" id="cameraOverlay">
+  <div class="sheet">
+    <h2>📷 <span data-i="camera">کامێرا</span></h2>
+    <div class="cam-wrap"><video id="camVideo" autoplay playsinline></video>
+      <div class="cam-btns"><button class="btn ghost" id="camCancel" style="color:#fff;border-color:#475569">✕</button><button class="shutter" id="camShutter">●</button></div>
+    </div>
+    <canvas id="camCanvas" class="hidden"></canvas>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
